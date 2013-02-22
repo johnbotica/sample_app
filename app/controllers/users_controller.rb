@@ -1,7 +1,8 @@
 class UsersController < ApplicationController
-  before_filter :signed_in_user,  only: [:index, :edit, :update, :destroy]
-  before_filter :correct_user,    only: [:edit, :update]
-  before_filter :admin_user,      only: :destroy
+  before_filter :signed_in_user,          only: [:index, :edit, :update, :destroy]
+  before_filter :correct_user,            only: [:edit, :update]
+  before_filter :admin_user,              only: :destroy
+  before_filter :redirect_signed_in_user, only: [:new, :create]  
   
   def show
     @user = User.find(params[:id])
@@ -40,8 +41,13 @@ class UsersController < ApplicationController
   end
   
   def destroy
-    User.find(params[:id]).destroy
-    flash[:success] = "User destroyed."
+    user = User.find(params[:id]) 
+    if user.id != current_user.id
+      user.destroy
+      flash[:success] = "User destroyed."
+    else
+      flash[:error] = "You cannot destroy yourself..."
+    end    
     redirect_to users_url
   end
   
@@ -51,6 +57,10 @@ class UsersController < ApplicationController
         store_location
         redirect_to signin_url, notice: "Please sign in."
       end
+    end
+    
+    def redirect_signed_in_user
+      redirect_to root_path if signed_in?
     end
     
     def correct_user
