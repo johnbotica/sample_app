@@ -216,3 +216,19 @@ aside {
     margin-bottom: 5px;
   }
 }
+
+/* character counter */
+#new_micropost {
+  position: relative;
+}
+#character-counter {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ddd;
+  &.char-count-warning {
+    color: #dd0000;
+  }
+}

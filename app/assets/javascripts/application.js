@@ -14,3 +14,24 @@
 //= require jquery_ujs
 //= require bootstrap
 //= require_tree .
+
+
+$(function(){
+    if( $('#micropost_content').length ){
+        var $mp_content = $('#micropost_content');
+        var $form = $mp_content.closest('form');
+        $form.append('<span id="character-counter" />');
+        var $charCounter = $('#character-counter');
+        $charCounter.html( '140' );
+        
+        $mp_content.on('keyup', function(event){
+            var chars = 140 - $(this).val().length;
+            $charCounter.html( chars );
+            if( chars <= 20 ){
+                $charCounter.addClass('char-count-warning');
+            }else{
+                $charCounter.removeClass('char-count-warning')
+            }
+        });
+    }
+});

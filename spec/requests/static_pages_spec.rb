@@ -28,9 +28,55 @@ describe "Static pages" do
       
       it "should render the user's feed" do
         user.feed.each do |item|
-          page.should have_selector("li##{item.id}", text: item.content)
+          page.should have_selector("li#micropost-#{item.id}", text: item.content)
         end
       end
+      
+      describe "sidebar microposts count" do
+        
+        it "should have proper count" do
+          page.should have_selector('span', text: "#{user.microposts.count} micropost")
+        end
+        
+        describe "proper pluralization" do
+          it "should be plural with multiple microposts" do
+            user.microposts.delete_all
+            FactoryGirl.create(:micropost, user: user, content: "Lorem Ipsum")
+            FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
+            visit root_path
+            
+            page.should have_selector('span', text: "2 microposts")
+          end
+          
+          it "should be plural with 0 microposts" do
+            user.microposts.delete_all
+            visit root_path
+            page.should have_selector('span', text: "0 microposts")
+          end
+          
+          it "should be singular with 1 micropost" do
+            user.microposts.delete_all
+            FactoryGirl.create(:micropost, user: user, content: "Lorem Ipsum")
+            visit root_path
+            
+            page.should have_selector('span', text: "1 micropost")
+          end
+        end
+      end
+      
+      describe "pagination" do
+        before(:all) { 30.times { FactoryGirl.create(:micropost, user: user) } }
+        after(:all) { user.microposts.delete_all }
+        
+        it { should have_selector('div.pagination') }
+        
+        it "should list each micropost" do
+          user.microposts.paginate(page: 1).each do |item|
+            page.should have_selector("li#micropost-#{item.id}", text: item.content)
+          end
+        end
+      end
+      
     end
   end
 
